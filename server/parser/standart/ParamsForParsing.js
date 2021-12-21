@@ -1,5 +1,5 @@
 
-class ParseParams  {
+module.exports = class ParamsForParsing  {
 
     constructor () {
         this._NHL = true
