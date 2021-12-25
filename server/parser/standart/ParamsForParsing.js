@@ -12,6 +12,7 @@ module.exports = class ParamsForParsing  {
             } else {
                 return new Date().getFullYear() - 2
             }
+
         })()
         this._startKHL = 2000
         this._endKHL = this._endNHL
@@ -21,6 +22,7 @@ module.exports = class ParamsForParsing  {
     get params () {
 
         return {
+
             NHL : this._NHL,
             KHL : this._KHL,
             startNHL : this._startNHL,
@@ -80,6 +82,7 @@ module.exports = class ParamsForParsing  {
     setEndKHL (year) {
 
         const result = checkYears(year, false, 'KHL', this.params)
+
         if(typeof result == 'number') {
             this._endKHL = year
         } else {
@@ -95,7 +98,6 @@ module.exports = class ParamsForParsing  {
         if (this._NHL === true) {
 
             let start = this._startNHL
-
             let end = this._endNHL
 
             for (start; start <= end;start++) {
@@ -109,7 +111,6 @@ module.exports = class ParamsForParsing  {
         if (this._KHL) {
 
             let start = this._startKHL
-
             let end = this._endKHL
 
             for (start; start <= end;start++) {
@@ -135,6 +136,7 @@ function checkYears (year, start, leage, params) {
     let result = null
 
     if (year >= 2000 && year < params.currentYear) {
+
         if (start == true) {
 
             if ( leage == 'NHL' ) {
@@ -150,6 +152,7 @@ function checkYears (year, start, leage, params) {
             }
 
         } else {
+
             if ( leage == 'NHL' ) {
 
                 result = params.startNHL <= year ?year : console.log(new Error('this value cant be less than start NHL'))
@@ -161,6 +164,7 @@ function checkYears (year, start, leage, params) {
                 result = params.startNHL <= year ?year : new Error('this value cant be more than start KHL')
                
             }
+            
         }
 
 

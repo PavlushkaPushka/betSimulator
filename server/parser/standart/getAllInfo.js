@@ -1,7 +1,6 @@
 const puppeteer = require ('puppeteer')
 const cheerio = require('cheerio')
 const Match = require('./ClassMatch')
-const scrapBookmaker = require('./getCoeffAboutMatch')
 
 
 function getLinkToMatch (id) {
@@ -10,7 +9,7 @@ function getLinkToMatch (id) {
     return `https://www.flashscore.com/match/${idForLink}/#match-summary`
 }
 
-function parseDataAboutMatch(elem) {
+function handlerDataAboutMatch(elem) {
 
     function count (obj) {
 
@@ -92,83 +91,57 @@ function getDate (elem, season) {
     
 }
 
-async function parseData (msv, season, browser) {
+function handlerData (msv, season) {
+
     let stage;
     let round;
     let data = [
 
     ]
-    
 
-    msv.map((elem)=>{
+    msv.map( (elem) => {
+
         let titleName = cheerio.load(elem)('span.event__title--name').text()
         let roundStatic = cheerio.load(elem)('.event__round--static').text()
 
         titleName !== '' ? stage = titleName : roundStatic !== '' ? round = roundStatic : 0
 
         let match = cheerio.load(elem)
-        if (match('div').attr('id') !== undefined) {
-            const commands = parseDataAboutMatch(match)
-            if(match('div').attr('id') !== undefined) {
-            const commands = parseDataAboutMatch(match)
-            let id = match('div').attr('id')
-            let date = getDate(match, season)
-            let link = getLinkToMatch(id)
-    
-                
-            let coeff = scrapBookmaker(browser, link)
-            //console.log(coeff)
-           // let coeff = 0
 
-            
-            const result = new Match(season, id, stage, round, date, commands.homeTeam, commands.awayTeam, link, coeff)  // link to match, data from mathch
-    
-            data.push(result)
+        if (match('div').attr('id') !== undefined) {
+
+            const commands = handlerDataAboutMatch(match)
+
+            if(match('div').attr('id') !== undefined) {
+
+                const commands = handlerDataAboutMatch(match)
+
+                let id = match('div').attr('id')
+
+                let date = getDate(match, season)
+
+                let link = getLinkToMatch(id)
+                
+                const result = new Match(season, id, stage, round, date, commands.homeTeam, commands.awayTeam, link)
+        
+                data.push(result)
             }
         }
     })
 
-    // for (let i = 0; i <= msv.length - 1; i++) {
-        
-    //         let titleName = cheerio.load(msv[i])('span.event__title--name').text()
-    //         let roundStatic = cheerio.load(msv[i])('.event__round--static').text()
-    
-    //         titleName !== '' ? stage = titleName : roundStatic !== '' ? round = roundStatic : 0
-    
-    //         let match = cheerio.load(msv[i])
-    
-    //         if(match('div').attr('id') !== undefined) {
-    //             const commands = parseDataAboutMatch(match)
-    //             let id = match('div').attr('id')
-    //             let date = getDate(match, season)
-    //             let link = getLinkToMatch(id)
-    
-                
-    //             let coeff = await scrapBookmaker(browser, link)
-    //             console.log(coeff)
-    
-    //             const result = new Match(season, id, stage, round, date, commands.homeTeam, commands.awayTeam, link, coeff)  // link to match, data from mathch
-    
-    //             data.push(result)
-    //         }
-    // }
-
-
     return data
+
 }
 
-async function getAllElem (page, browser) {
+async function getAllInfoFromMainPage (page) {
 
-    let name = await page.$eval('.teamHeader__text', elem => elem.innerText)
+    let season = await page.$eval('.teamHeader__text', elem => elem.innerText)
 
     const elemsFromMain = await page.evaluate(() => Array.from(document.querySelectorAll('#live-table > div.event.event--results > div > div > *'), element => element.outerHTML));
 
-    //console.log(i)
-    return parseData(elemsFromMain, name, browser)
-
-    
+    return handlerData(elemsFromMain, season)
 
 }
 
 
-module.exports = getAllElem
+module.exports = getAllInfoFromMainPage

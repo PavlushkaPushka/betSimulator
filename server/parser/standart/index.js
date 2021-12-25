@@ -1,14 +1,15 @@
 const ParamsForParsing = require('./ParamsForParsing')
 const puppeteer = require('puppeteer')
 const downloadAllElemOnPage = require('./downloadAllInfoOnPage')
-const getAllElem = require('./getAllElem')
+const getAllInfoFromMainPage = require('./getAllInfo')
+const getCoeff = require('./getCoeff')
 
 const some = new ParamsForParsing()
-// some.setStartKHL(2019)
-// some.setEndKHL(2019)
+some.setStartKHL(2018)
+some.setEndKHL(2018)
 some.setStartNHL(2019)
 some.setEndNHL(2019)
-some.setKHL(false)
+some.setNHL(false)
 
 
  async function  parsingData (params) {
@@ -33,20 +34,27 @@ some.setKHL(false)
     
         //await downloadAllElemOnPage(page)
 
-        const infoAboutMatches = await getAllElem(page, browser)
+        const infoFromMainPage = await getAllInfoFromMainPage(page)
 
+        const infoWithCoeff = await getCoeff(browser, infoFromMainPage)
+
+
+
+        // получаем год и делаем ключом в объекте
         let a = links[i].split('/')[5].split('-')
-        console.log(a)
 
-        if (a[0] == 'nhl') result.nhl[a[1] + '-' + a[2]] = infoAboutMatches
-        if (a[0] == 'khl') result.khl[a[1] + '-' + a[2]] = infoAboutMatches
+
+        if (a[0] == 'nhl') result.nhl[a[1] + '-' + a[2]] = infoWithCoeff
+        if (a[0] == 'khl') result.khl[a[1] + '-' + a[2]] = infoWithCoeff
 
         await page.close()
 
     }
 
     console.log(result)
-    console.log(result.khl)
+    console.log(result.khl['2018-2019'][5])
+    console.log(result.khl['2018-2019'][2])
+    console.log(result.khl['2018-2019'][7])
     browser.close()
 }
 
