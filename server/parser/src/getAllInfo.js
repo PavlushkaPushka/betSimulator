@@ -121,8 +121,20 @@ function handlerData (msv, season) {
                 let date = getDate(match, season)
 
                 let link = getLinkToMatch(id)
+
+                const result = {
+                    season : season,
+                    id : id,
+                    stage : stage, 
+                    round : round, 
+                    date : date, 
+                    homeTeam : commands.homeTeam, 
+                    awayTeam : commands.awayTeam, 
+                    linkToMatch : link,
+                    moreInfo : null
+                }
                 
-                const result = new Match(season, id, stage, round, date, commands.homeTeam, commands.awayTeam, link)
+                //const result = new Match(season, id, stage, round, date, commands.homeTeam, commands.awayTeam, link)
         
                 data.push(result)
             }
