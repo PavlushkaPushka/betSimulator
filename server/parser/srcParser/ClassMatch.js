@@ -28,16 +28,6 @@ class Match {
 
     }
 
-    // get id () {
-    //     return this.id
-    // }
-
-    // get linkToMatch () {
-
-    //     return this.linkToMatch
-
-    // }
-
 }
 
 module.exports = Match

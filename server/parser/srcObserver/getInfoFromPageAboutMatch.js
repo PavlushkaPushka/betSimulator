@@ -1,4 +1,4 @@
-const puppeteer = require ('puppeteer')
+const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
 const download = require('image-downloader')
 const fs = require('fs')
@@ -6,37 +6,43 @@ const path = require('path')
 
 
 
-async function getInfo (browser, matches) {
+async function getInfo(browser, matches, pathToSave, pagesInOneIteration) {
     //this function is designed to adjust the parsing speed (how many pages are opened at a time. you need just change a variable name's like @step@ )
+
+    // let problems = problemElements
+
     let matchesFor = []
 
-    let step = 7
+    let step = pagesInOneIteration
 
     let remainder = (matches.length - 1) % step
 
     for (let i = 0; i <= matches.length - 1; i++) {
 
-        matchesFor.push(matches[i])
+        if (matches[i].moreInfo == null) {
 
-        if ((i) % step == 0 || remainder !== 0 && i == matches.length - 1) {
+            matchesFor.push(matches[i])
 
-            try {
+            if ((i) % step == 0 || remainder !== 0 && i == matches.length - 1) {
 
-                await Promise.all(matchesFor.map( async (elem) => {
-                    const info = await getInfoFromPage(browser, elem.linkToMatch)
-                    elem.moreInfo = info
-                }))
+                try {
 
-            } catch (error) {
+                    await Promise.all(matchesFor.map(async (elem) => {
+                        const info = await getInfoFromPage(browser, elem.linkToMatch, pathToSave)
+                        elem.moreInfo = info
+                    }))
 
-                i = matches.length - 1
+                } catch (error) {
 
-                console.log('getting not all information' + '\n' + error)
+                    i = matches.length - 1
+
+                    console.log('getting not all information' + '\n' + error)
+
+                }
+
+                matchesFor = []
 
             }
-
-            matchesFor = []
-
         }
 
     }
@@ -44,7 +50,7 @@ async function getInfo (browser, matches) {
 
 }
 
-async function getInfoFromPage (browser, link) {
+async function getInfoFromPage(browser, link, pathToSave) {
 
 
     // open page with puppeteer
@@ -57,7 +63,7 @@ async function getInfoFromPage (browser, link) {
     // get info info about course of the Matches 
     const theCourseOfTheMatch = await page2.evaluate(() => Array.from(document.querySelectorAll('.section > *'), element => element.outerHTML));
     // get info about Logo
-    const logoType = await getLogo (page2)
+    const logoType = await getLogo(page2, pathToSave)
     //handling data about course of the match
     const handlerInfoAbotMatch = theCourseOfTheMatch.map((elem) => {
 
@@ -84,7 +90,7 @@ async function getInfoFromPage (browser, link) {
     let infoAboutMatch = handlerInfoAbotMatch.filter(item => item !== undefined)
 
     // handling data about coeff with cheerio
-    const msv = coeff.map((elem) => {
+    let msv = coeff.map((elem) => {
 
         let $ = cheerio.load(elem)('div').attr('title')
 
@@ -92,22 +98,34 @@ async function getInfoFromPage (browser, link) {
 
             let result;
 
-            if($ !== 'Odds removed by bookmaker.') {
+            if ($ !== 'Odds removed by bookmaker.') {
 
                 result = $.split((/\[[a-z]\]/))
+                result = result.map((element) => {
+                    if (element !== '') {
+
+                        return Number(element)
+                    } else {
+                        $ = cheerio.load(elem)('.oddsValueInner').text()
+                        return Number($)
+                    }
+
+                })
 
             } else {
                 $ = cheerio.load(elem)('.oddsValueInner').text()
 
                 result = [
-                
+
                     Number($),
-                    Number($)
+                    Number($),
+
                 ]
+
             }
-            
+
             return result
-        
+
         }
 
         return 0
@@ -118,18 +136,18 @@ async function getInfoFromPage (browser, link) {
 
     return {
 
-        homeTeam : msv[1],
-        draw : msv[2],
-        awayTeam : msv[3],
-        link : link,
-        inDetailAboutMatch : infoAboutMatch,
-        teamsLogo : logoType
+        homeTeam: msv[1],
+        draw: msv[2],
+        awayTeam: msv[3],
+        link: link,
+        inDetailAboutMatch: infoAboutMatch,
+        teamsLogo: logoType
 
     }
-        
+
 }
 
-async function getLogo (page) {
+async function getLogo(page, pathToSave) {
     // get teams names on page
     let homeName = await page.$eval('#detail > div.duelParticipant > div.duelParticipant__home > div.participant__participantNameWrapper > div.participant__participantName.participant__overflow > a', (elem) => elem.text)
     let awayName = await page.$eval('#detail > div.duelParticipant > div.duelParticipant__away > div.participant__participantNameWrapper > div.participant__participantName.participant__overflow > a', (elem) => elem.text)
@@ -139,7 +157,7 @@ async function getLogo (page) {
 
     // get teams from dir (which been downloaded)
     const downloadedTeams = await new Promise((resolve, reject) => {
-        fs.readdir('D:/myWorks/new/betSimulator/server/parsedData/logo', async (err, files) => {
+        fs.readdir(`${pathToSave}/logo`, async (err, files) => {
             if (err) {
                 console.log(err);
             } else {
@@ -152,33 +170,33 @@ async function getLogo (page) {
     let homeIs = false
     let awayIs = false
 
-    
 
-    downloadedTeams.forEach( (elem) => {
+
+    downloadedTeams.forEach((elem) => {
         if (elem.indexOf(homeName) !== -1) {
             homeIs = true
-        } 
+        }
         if (elem.indexOf(awayName) !== -1) {
             awayIs = true
-        } 
+        }
     })
 
     // call function for download logo or returns the path
-    let homeDest = await downloadLogo(urlHome, homeName, homeIs);
-    let awayDest = await downloadLogo(urlAway, awayName, awayIs);
-    
+    let homeDest = await downloadLogo(urlHome, homeName, homeIs, pathToSave);
+    let awayDest = await downloadLogo(urlAway, awayName, awayIs, pathToSave);
+
     return {
-        homeLogo : homeDest,
-        awayLogo : awayDest
+        homeLogo: homeDest,
+        awayLogo: awayDest
     }
 
 }
 
-async function downloadLogo (url, teamName, bool) {
+async function downloadLogo(url, teamName, bool, pathToSave) {
 
     let options = {
         url: url,
-        dest: `D:/myWorks/new/betSimulator/server/parsedData/logo/${teamName}.png`,         // will be saved to /path/to/dest/photo
+        dest: `${pathToSave}/logo/${teamName}.png`,         // will be saved to /path/to/dest/photo
         extractFilename: false
     }
 
