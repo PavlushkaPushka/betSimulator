@@ -82,8 +82,6 @@ function getDate(elem, season) {
         minutes: Number(elem('.event__time').text().substr(10, 2))
     }
 
-    // console.log(Date.UTC(infoDate.year, infoDate.mounth, infoDate.day, infoDate.hour, infoDate.minutes))
-
     if (Number(infoDate.mounth) < 6) {
         infoDate.year = Number(last)
     } else {
@@ -140,8 +138,6 @@ function handlerData(msv, season) {
                 moreInfo: null
             }
 
-            //const result = new Match(season, id, stage, round, date, commands.homeTeam, commands.awayTeam, link)
-
             data.push(result)
         }
 
@@ -153,7 +149,7 @@ function handlerData(msv, season) {
 
 async function getAllInfoFromMainPage(page) {
 
-    let season = await page.$eval('.teamHeader__text', elem => elem.innerText)
+    let season = await page.$eval('.heading__info', elem => elem.innerText)
 
     const elemsFromMain = await page.evaluate(() => Array.from(document.querySelectorAll('#live-table > div.event.event--results > div > div > *'), element => element.outerHTML));
 

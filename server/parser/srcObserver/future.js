@@ -1,6 +1,4 @@
-const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
-const Match = require('../srcParser/ClassMatch')
 
 
 function getLinkToMatch(id) {
@@ -35,8 +33,6 @@ function getDate(elem, season) {
         hour: Number(elem('.event__time').text().substr(7, 2)),
         minutes: Number(elem('.event__time').text().substr(10, 2))
     }
-
-    // console.log(Date.UTC(infoDate.year, infoDate.mounth, infoDate.day, infoDate.hour, infoDate.minutes))
 
     if (Number(infoDate.mounth) < 6) {
         infoDate.year = Number(last)
@@ -92,9 +88,6 @@ function handlerData(msv, season) {
                 linkToMatch: link,
                 moreInfo: null
             }
-            // console.log(result)
-
-            //const result = new Match(season, id, stage, round, date, commands.homeTeam, commands.awayTeam, link)
 
             data.push(result)
         }
@@ -106,7 +99,7 @@ function handlerData(msv, season) {
 
 async function getInfoFuture(page) {
 
-    let season = await page.$eval('.teamHeader__text', elem => elem.innerText)
+    let season = await page.$eval('.heading__info', elem => elem.innerText)
 
     const elemsFromMain = await page.evaluate(() => Array.from(document.querySelectorAll('#live-table > div.event.event--fixtures > div > div > *'), element => element.outerHTML));
 

@@ -1,8 +1,5 @@
-const { dir } = require('console');
 const fs = require('fs');
-const { resolve } = require('path');
-// считать папку, провести проверку данных, если матч этот уже есть то консолим что данный матч есть
-// сделать чекинг, настроить енв, вивер,
+
 async function checkingData(currentSeason, infoFromMainPage, pathToSave) {
 
     let season;
@@ -26,7 +23,6 @@ async function checkingData(currentSeason, infoFromMainPage, pathToSave) {
 
         if (elem.indexOf(season) !== -1) {
 
-            console.log(elem)
             existenceData = true
 
         }
@@ -47,18 +43,16 @@ async function checkingData(currentSeason, infoFromMainPage, pathToSave) {
                 existenceData = false
             }
 
-            for (i = infoFromMainPage.length - 1; i !== 0; i--) {
+            for (i = data.length - 1; i !== 0; i--) {
 
-                const bool = data[i - between].id == infoFromMainPage[i].id
+                const bool = data[i].id == infoFromMainPage[i + between].id
 
                 if (bool) {
 
-                    if (data[i - between].moreInfo !== null) {
+                    if (data[i].moreInfo !== null) {
 
-                        infoFromMainPage[i].moreInfo = data[i - between].moreInfo
+                        infoFromMainPage[i + between].moreInfo = data[i].moreInfo
 
-                    } else {
-                        existenceData = false
                     }
 
                 }
@@ -74,7 +68,7 @@ async function checkingData(currentSeason, infoFromMainPage, pathToSave) {
 }
 
 async function jsonReader(filePath) {
-    // console.log(cb())
+
     const data = await new Promise((resolve, reject) => {
         fs.readFile(filePath, 'utf-8', async (err, fileData) => {
             if (err) {

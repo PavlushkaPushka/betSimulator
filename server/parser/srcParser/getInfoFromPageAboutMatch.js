@@ -9,8 +9,6 @@ const path = require('path')
 async function getInfo(browser, matches, pathToSave, pagesInOneIteration) {
     //this function is designed to adjust the parsing speed (how many pages are opened at a time. you need just change a variable name's like @step@ )
 
-    // let problems = problemElements
-
     let matchesFor = []
 
     let step = pagesInOneIteration
@@ -51,7 +49,6 @@ async function getInfo(browser, matches, pathToSave, pagesInOneIteration) {
 }
 
 async function getInfoFromPage(browser, link, pathToSave) {
-
 
     // open page with puppeteer
     const page2 = await browser.newPage()

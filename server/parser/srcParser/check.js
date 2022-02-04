@@ -1,6 +1,5 @@
-const { dir } = require('console');
 const fs = require('fs');
-const { resolve } = require('path');
+
 // считать папку, провести проверку данных, если матч этот уже есть то консолим что данный матч есть
 // сделать чекинг, настроить енв, вивер,
 async function checkingData(currentSeason, infoFromMainPage, pathToSave) {
@@ -8,8 +7,6 @@ async function checkingData(currentSeason, infoFromMainPage, pathToSave) {
     let season = currentSeason[1] + '-' + currentSeason[2]
     let leage = currentSeason[0] == 'superliga' ? 'khl' : currentSeason[0] == 'khl' ? 'khl' : currentSeason[0] == 'nhl' ? 'nhl' : undefined
     let existenceData = false;
-    // console.log(__dirname)
-
     let path = `${pathToSave}/data/${leage}/`
     let files = await readDir(path)
 
@@ -28,7 +25,6 @@ async function checkingData(currentSeason, infoFromMainPage, pathToSave) {
 
         let pathToFile = path + season + '.json'
         let data = await jsonReader(pathToFile)
-        // let problems = []
 
         if (data.length == infoFromMainPage.length) {
 
@@ -42,12 +38,11 @@ async function checkingData(currentSeason, infoFromMainPage, pathToSave) {
                         infoFromMainPage[i].moreInfo = data[i].moreInfo
 
                     } else {
-                        // problems.push(i)
+
                         existenceData = false
                     }
 
                 } else {
-                    // wiever
                 }
             }
         }
@@ -60,7 +55,7 @@ async function checkingData(currentSeason, infoFromMainPage, pathToSave) {
 }
 
 async function jsonReader(filePath) {
-    // console.log(cb())
+
     const data = await new Promise((resolve, reject) => {
         fs.readFile(filePath, 'utf-8', async (err, fileData) => {
             if (err) {

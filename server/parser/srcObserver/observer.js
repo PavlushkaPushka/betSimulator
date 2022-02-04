@@ -3,8 +3,6 @@ const puppeteer = require('puppeteer')
 const { createDataStructure, savingData } = require('../srcParser/saveData')
 const downloadAllElemOnPage = require('./../srcParser/downloadAllInfoOnPage')
 const getAllInfoFromMainPage = require('./../srcParser/getAllInfo')
-// const getInfo = require('../srcParser/getInfoFromPageAboutMatch')
-// const getInfoAboutFutureMatches = require('./futureMatches')
 const getInfoFuture = require('./future')
 const getInfo = require('./getInfoFromPageAboutMatch')
 const { checkingData } = require('./check')
@@ -14,7 +12,7 @@ async function observ(params, pathToSave, iteration) {
 
     let linksMassive = []
     let existenceData;
-    // console.log(linksMassive)
+
     params._NHL == true ? linksMassive.push('https://www.flashscore.ru.com/hockey/usa/nhl/results/') : null
     params._KHL == true ? linksMassive.push('https://www.flashscore.ru.com/khl/results/') : null
 
@@ -49,7 +47,7 @@ async function observ(params, pathToSave, iteration) {
         const infoAboutCompletedMatches = await getAllInfoFromMainPage(page)
 
         existenceData = await checkingData(linksMassive[i], infoAboutCompletedMatches, pathToSave)
-        console.log(existenceData)
+
         if (!existenceData) {
 
             try {
@@ -69,12 +67,6 @@ async function observ(params, pathToSave, iteration) {
 
         }
 
-
-        // console.log(linksMassive[i])
-        console.log(infoAboutCompletedMatches[0])
-
-
-        // check on new page
         let linkToSchedule = linksMassive[i].indexOf('khl') !== -1 ? 'https://www.flashscore.ru.com/khl/fixtures/' : linksMassive[i].indexOf('nhl') !== -1 ? 'https://www.flashscore.ru.com/hockey/usa/nhl/fixtures/' : null
         console.log(linkToSchedule)
         try {
@@ -102,7 +94,7 @@ async function observ(params, pathToSave, iteration) {
             }
 
         }
-        console.log(existenceData)
+
         if (!existenceData) {
             try {
 
@@ -120,12 +112,6 @@ async function observ(params, pathToSave, iteration) {
             }
         }
 
-        // console.log(infoAboutFutureMatches[0])
-        console.log(infoAboutFutureMatches.length)
-        // console.log(infoAboutFutureMatches[90])
-
-
-
         await page.close()
 
     }
@@ -135,9 +121,5 @@ async function observ(params, pathToSave, iteration) {
     browser.close()
 
 }
-
-
-// observ(params)
-// решить проблему со временем 
 
 module.exports = observ

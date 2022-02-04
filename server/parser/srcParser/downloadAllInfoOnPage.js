@@ -8,7 +8,6 @@ const downloadAllElemOnPage = async function (page) {
     const pendingXHR = new PendingXHR(page)
 
     let some = await page.$('#live-table > .event > .leagues--static > .sportName > .event__more')
-    // console.log(some)
 
     let one = 0
 
